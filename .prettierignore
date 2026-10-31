@@ -1,0 +1,14 @@
+# Generado
+dist/
+coverage/
+node_modules/
+
+# Lo mantiene npm, no se formatea a mano
+package-lock.json
+
+# El markdown lo gobierna el .editorconfig: las tablas de CLAUDE.md y de
+# convenciones.md estan hechas a mano y Prettier las reacomoda en cada apply.
+*.md
+
+# Assets
+*.svg

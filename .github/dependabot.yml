@@ -1,0 +1,31 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: '/'
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    # Sin este prefijo los mensajes de Dependabot no pasarian el hook
+    # commit-msg al rebasear en local.
+    commit-message:
+      prefix: 'chore(deps)'
+    groups:
+      # Las piezas fragiles del harness llegan en un solo PR: si se rompen, se
+      # rompen juntas y se revierten con un git revert.
+      harness-de-calidad:
+        patterns:
+          - 'prettier'
+          - 'eslint'
+          - 'eslint-plugin-vue'
+          - '@eslint/*'
+          - '@vue/eslint-config-*'
+          - 'typescript-eslint'
+
+  - package-ecosystem: github-actions
+    directory: '/'
+    schedule:
+      interval: weekly
+      day: monday
+    commit-message:
+      prefix: 'ci(deps)'

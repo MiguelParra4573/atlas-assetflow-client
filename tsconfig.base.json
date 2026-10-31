@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "es2023",
+    "skipLibCheck": true,
+
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+
+    /* Rigor del tipado, encima de lo que ya trae @vue/tsconfig (strict). */
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+
+    /* Codigo muerto y trampas de sintaxis */
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "erasableSyntaxOnly": true,
+    "noFallthroughCasesInSwitch": true
+  }
+}

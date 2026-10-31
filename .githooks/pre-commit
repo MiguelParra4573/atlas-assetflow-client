@@ -1,0 +1,47 @@
+#!/bin/sh
+# Gate rapido local. La autoridad es CI; aqui solo corre lo que tarda segundos.
+#
+# No corre vue-tsc, que es de proyecto completo y no de archivos staged, ni
+# los tests, ni el build. Eso es trabajo de CI.
+#
+# Verifica, nunca arregla: un hook que reescribe archivos con staging parcial
+# deja el indice desincronizado y commitea algo que nadie leyo.
+set -e
+
+# Solo lo que esta en el indice. ACMR excluye los borrados: verificar un archivo
+# borrado falla.
+cambiados=$(git diff --cached --name-only --diff-filter=ACMR)
+
+# Dos listas distintas a proposito. Prettier formatea tambien css y json;
+# ESLint solo entiende .ts/.vue, y si se le pasa una lista en la que ningun
+# archivo le corresponde sale con error ("No files matching the pattern"),
+# que seria un falso positivo en cada commit de css o de configuracion.
+formatear=$(printf '%s\n' "$cambiados" | grep -E '\.(ts|vue|js|mjs|cjs|css|json|html)$' || true)
+lintear=$(printf '%s\n' "$cambiados" | grep -E '\.(ts|vue|js|mjs|cjs)$' || true)
+
+if [ -z "$formatear" ] && [ -z "$lintear" ]; then
+    # Un commit que solo toca markdown no paga el arranque de node.
+    exit 0
+fi
+
+if [ -n "$formatear" ]; then
+    echo "pre-commit: prettier --check"
+    # --no-error-on-unmatched-pattern: si todos los archivos staged estan en
+    # .prettierignore (package-lock.json, por ejemplo), no debe fallar.
+    if ! printf '%s\n' "$formatear" | xargs npx prettier --check --no-error-on-unmatched-pattern; then
+        echo "" >&2
+        echo "pre-commit: el formato fallo." >&2
+        echo "  para arreglarlo: npm run format" >&2
+        exit 1
+    fi
+fi
+
+if [ -n "$lintear" ]; then
+    echo "pre-commit: eslint"
+    if ! printf '%s\n' "$lintear" | xargs npx eslint --max-warnings 0; then
+        echo "" >&2
+        echo "pre-commit: el lint fallo." >&2
+        echo "  para ver detalle: npm run lint" >&2
+        exit 1
+    fi
+fi

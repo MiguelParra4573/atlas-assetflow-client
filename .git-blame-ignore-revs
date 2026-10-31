@@ -1,0 +1,9 @@
+# Commits de puro reformateo, que no deben aparecer en `git blame`.
+#
+# Activalo una vez por clon:
+#   git config blame.ignoreRevsFile .git-blame-ignore-revs
+#
+# GitHub lo honra automaticamente en su vista de blame.
+#
+# Regla: aqui solo entran commits generados por `npm run format` sin ninguna
+# edicion manual. Si un commit mezcla formato con logica, no va.
