@@ -6,7 +6,7 @@ Vue 3 + TypeScript + Pinia + Vue Router + Vitest, sobre Vite.
 
 ```
 npm install
-npm run dev      # http://localhost:5173 (proxy /api → http://localhost:8091)
+npm run dev      # http://localhost:15273 (proxy /api → http://localhost:8091)
 npm test
 npm run build
 ```
