@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+
+# Sin esto se hereda el default del repositorio, que puede ser write-all: un
+# GITHUB_TOKEN con permiso de escritura en un job que ejecuta codigo de un PR de
+# fork.
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  # Solo en pull requests. Cancelar corridas de main o develop dejaria sin
+  # resultado justo el historial que se mira cuando algo se rompio.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  frontend:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      # npm ci y no npm install: respeta el package-lock.json, que es lo que
+      # hace que las versiones pineadas de prettier y eslint signifiquen algo.
+      - run: npm ci
+
+      # Ordenados del mas rapido y mas barato de arreglar al mas caro. Si
+      # vue-tsc ya fallo, vite build no agrega informacion.
+      - name: formato
+        run: npm run format:check
+
+      - name: lint
+        run: npm run lint
+
+      - name: tipos
+        run: npm run typecheck
+
+      - name: tests con cobertura
+        run: npm run test:coverage
+
+      - name: build
+        run: npm run build
+
+      # Con if: always() porque el caso en que mas se quiere ver el reporte es
+      # justo cuando los tests o el umbral fallaron.
+      - name: reporte de cobertura
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cobertura
+          path: coverage/
+          if-no-files-found: warn

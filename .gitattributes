@@ -1,0 +1,14 @@
+# Fin de linea normalizado a LF en el indice y en el working tree.
+#
+# Sin la primera linea, `core.autocrlf` decide por su cuenta y el working tree
+# queda en CRLF mientras el .editorconfig pide LF: Prettier resuelve el fin de
+# linea leyendo el .editorconfig por defecto, y un CRLF suelto en el disco
+# produce un diff de puros \r que no tiene nada que ver con el formato del
+# codigo. `eol=lf` sobrescribe `core.autocrlf`.
+* text=auto eol=lf
+
+/.githooks/** text eol=lf
+
+*.png binary
+*.jpg binary
+*.svg text eol=lf
